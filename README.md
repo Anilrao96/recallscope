@@ -59,6 +59,12 @@ A relational database can model these records, but every additional supply-chain
 
 The main query in `server/graph.js` performs a parameterized, multi-hop traversal from a recalled batch to product units and their owners. It uses the official `neo4j-driver`; no Cypher is string-concatenated.
 
+### Live graph in CognoDB
+
+![RecallScope graph data in CognoDB Browser](docs/images/cognodb-graph-explorer-redacted.png)
+
+*The live CognoDB graph: recalled batches connect to product units, customers, warehouses, regions, and service centres. This is the relationship network RecallScope traverses to turn one batch alert into a clear action plan.*
+
 ## Key graph queries
 
 `getAffectedUnits(batchId)` starts at a `PartBatch`, traverses to all installed product units, and follows either the ownership path (`SOLD_TO → LOCATED_IN`) or the inventory path (`STORED_AT`). That single relationship-centric query lets RecallScope distinguish customers who require outreach from stock that can be quarantined.
