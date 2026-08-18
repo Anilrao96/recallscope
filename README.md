@@ -61,7 +61,7 @@ The main query in `server/graph.js` performs a parameterized, multi-hop traversa
 
 ### Live graph in CognoDB
 
-![RecallScope graph data in CognoDB Browser](docs/images/cognodb-graph-explorer-redacted.png)
+![RecallScope graph data in CognoDB Browser](docs/images/cognodb-graph-explorer.png)
 
 *The live CognoDB graph: recalled batches connect to product units, customers, warehouses, regions, and service centres. This is the relationship network RecallScope traverses to turn one batch alert into a clear action plan.*
 
