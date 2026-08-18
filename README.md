@@ -28,8 +28,18 @@ A relational database can model these records, but every additional supply-chain
 | `ProductUnit` | `id`, `model`, `status` | `SOLD_TO` → `Customer` |
 | `Customer` | `id`, `name`, `activeVehicle` | `LOCATED_IN` → `Region` |
 | `Region` | `name` | Groups customers for action planning |
+| `Warehouse` | `id`, `name`, `city` | Receives affected unsold inventory through `STORED_AT` |
+| `ServiceCenter` | `id`, `name` | `SERVES` → `Region` for local recall routing |
 
 The main query in `server/graph.js` performs a parameterized, multi-hop traversal from a recalled batch to product units and their owners. It uses the official `neo4j-driver`; no Cypher is string-concatenated.
+
+## Key graph queries
+
+`getAffectedUnits(batchId)` starts at a `PartBatch`, traverses to all installed product units, and follows either the ownership path (`SOLD_TO → LOCATED_IN`) or the inventory path (`STORED_AT`). That single relationship-centric query lets RecallScope distinguish customers who require outreach from stock that can be quarantined.
+
+`createRecallPlan(batchId)` uses `MERGE` to create a durable plan node idempotently. The dashboard rereads the plan state after creation.
+
+The seed includes two battery batches, 13 product units, 8 customers, 2 warehouses, 4 regions, and 4 service centres. Only `RB-2107` is active in the current dashboard; the second batch makes the dataset suitable for extending the recall-history experience.
 
 ## Run locally
 
@@ -57,9 +67,23 @@ Open `http://localhost:5173`. Without CognoDB environment variables, the interfa
 Deploy as a Node web service on Render:
 
 1. Push this repository to GitHub and create a Render **Web Service**.
-2. Build command: `npm install && npm run build`.
+2. Build command: `npm ci && npm run build`.
 3. Start command: `npm start`.
 4. Add the three `COGNODB_*` variables in Render’s environment settings.
 5. Run `npm run seed` once locally against the same CognoDB instance before demonstrating the application.
 
+The included `render.yaml` supplies these commands automatically when you create a Render Blueprint. The application serves both the API and production React client from this single Node service.
+
 The app gracefully reports unavailable database connections rather than exposing connection details to the browser.
+
+## Verification checklist
+
+Before recording the demo, run:
+
+```bash
+npm run seed
+npm run build
+npm run dev
+```
+
+Then verify the dashboard loads in live mode, the warehouse action filters to quarantinable stock, an owner opens an explainable path, and **Create recall plan** persists its status after refresh.

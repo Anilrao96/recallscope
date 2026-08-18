@@ -22,13 +22,22 @@ export async function getAffectedUnits(batchId) {
   const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
   try {
     const result = await session.run(
-      `MATCH path = (batch:PartBatch {id: $batchId})-[:INSTALLED_IN]->(unit:ProductUnit)-[:SOLD_TO]->(customer:Customer)
+      `MATCH (batch:PartBatch {id: $batchId})-[:INSTALLED_IN]->(unit:ProductUnit)
+       OPTIONAL MATCH (unit)-[:SOLD_TO]->(customer:Customer)
        OPTIONAL MATCH (customer)-[:LOCATED_IN]->(region:Region)
-       RETURN DISTINCT unit.id AS id, unit.model AS model, customer.name AS owner, region.name AS city,
+       OPTIONAL MATCH (unit)-[:STORED_AT]->(warehouse:Warehouse)
+       OPTIONAL MATCH (serviceCenter:ServiceCenter)-[:SERVES]->(region)
+       RETURN DISTINCT unit.id AS id, unit.model AS model,
+              coalesce(customer.name, warehouse.name) AS owner,
+              coalesce(region.name, warehouse.city) AS city,
               coalesce(unit.status, 'in_use') AS state,
-              CASE WHEN customer.activeVehicle = true THEN 'Urgent' ELSE 'Priority' END AS risk,
-              [node IN nodes(path) | CASE WHEN node:Customer THEN node.name ELSE coalesce(node.id, node.name) END] AS path
-       ORDER BY customer.name`,
+              CASE WHEN customer IS NULL THEN 'Contain'
+                   WHEN customer.activeVehicle = true THEN 'Urgent' ELSE 'Priority' END AS risk,
+              CASE WHEN customer IS NULL THEN 'warehouse' ELSE 'customer' END AS recordType,
+              serviceCenter.name AS serviceCenter,
+              CASE WHEN customer IS NULL THEN [batch.id, unit.id, warehouse.name]
+                   ELSE [batch.id, unit.id, customer.name] END AS path
+       ORDER BY risk, owner`,
       { batchId }
     );
     return result.records.map((record) => record.toObject());
@@ -69,6 +78,21 @@ export async function createRecallPlan(batchId) {
     );
     if (!result.records.length) return null;
     return result.records[0].toObject();
+  } finally {
+    await session.close();
+  }
+}
+
+export async function getRecallPlan(batchId) {
+  const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
+  try {
+    const result = await session.run(
+      `MATCH (plan:RecallPlan {batchId: $batchId})
+       RETURN plan.status AS status, toString(plan.createdAt) AS createdAt,
+              toString(plan.updatedAt) AS updatedAt`,
+      { batchId }
+    );
+    return result.records.length ? result.records[0].toObject() : null;
   } finally {
     await session.close();
   }
