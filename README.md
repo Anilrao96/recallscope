@@ -4,6 +4,18 @@ RecallScope turns a defective-part notification into an explainable recall actio
 
 **Live demo:** [https://recallscope.onrender.com](https://recallscope.onrender.com)
 
+## Where RecallScope runs
+
+RecallScope is hosted as a live web application on **Render** at the demo link above. Render runs the user interface and application server together, so visitors only need a browser to use it.
+
+The application reads its live recall data from **CognoDB Cloud**. CognoDB stores the connections between recalled batches, products, customers, warehouses, regions, and service centres. Database credentials are stored only as private Render environment variables; they are never included in this repository.
+
+```text
+Visitor's browser → RecallScope on Render → CognoDB Cloud
+```
+
+Every push to the `main` branch on GitHub triggers Render to deploy the latest version automatically.
+
 ## The user story
 
 Radian Battery Works flags lithium battery batch `RB-2107` for thermal variance. An operator needs to answer one urgent question: **which products, customers, and operational teams are affected?**
