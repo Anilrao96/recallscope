@@ -1,0 +1,18 @@
+nav button {
+  appearance: none;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #a9bec5;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+nav button.active,
+nav button:hover {
+  background: #143342;
+  color: #fff;
+}
