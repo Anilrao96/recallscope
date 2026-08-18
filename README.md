@@ -2,6 +2,8 @@
 
 RecallScope turns a defective-part notification into an explainable recall action plan. Starting with a supplier batch, an operations lead can trace affected product units and customers, see the geographic impact, and decide what needs to happen first.
 
+**Live demo:** [https://recallscope.onrender.com](https://recallscope.onrender.com)
+
 ## The user story
 
 Radian Battery Works flags lithium battery batch `RB-2107` for thermal variance. An operator needs to answer one urgent question: **which products, customers, and operational teams are affected?**
