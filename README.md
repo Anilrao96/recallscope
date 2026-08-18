@@ -16,6 +16,18 @@ Visitor's browser → RecallScope on Render → CognoDB Cloud
 
 Every push to the `main` branch on GitHub triggers Render to deploy the latest version automatically.
 
+## Technology stack
+
+| Layer | Technology | Why it is used |
+| --- | --- | --- |
+| User interface | React + Vite | Fast, responsive single-page dashboard experience |
+| Application server | Node.js + Express | Provides the API, error handling, and secure server-side database access |
+| Graph database | CognoDB Cloud | Stores and traverses the recall network |
+| Database driver | Official Neo4j JavaScript driver | Connects to CognoDB using parameterized Cypher queries |
+| Styling | CSS | Lightweight, purpose-built responsive interface with no component-library overhead |
+| Hosting | Render Starter web service | Always-on hosted demo for reviewers |
+| Source control and delivery | GitHub + Render Blueprint | Versioned code with automatic deployment from `main` |
+
 ## The user story
 
 Radian Battery Works flags lithium battery batch `RB-2107` for thermal variance. An operator needs to answer one urgent question: **which products, customers, and operational teams are affected?**
