@@ -108,9 +108,6 @@ The included `render.yaml` supplies these commands automatically when you create
 
 The app gracefully reports unavailable database connections rather than exposing connection details to the browser.
 
-## Verification checklist
-
-Before recording the demo, run:
 
 ```bash
 npm run seed
@@ -118,4 +115,3 @@ npm run build
 npm run dev
 ```
 
-Then verify the dashboard loads in live mode, the warehouse action filters to quarantinable stock, an owner opens an explainable path, and **Create recall plan** persists its status after refresh.
